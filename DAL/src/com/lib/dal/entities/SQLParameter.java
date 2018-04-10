@@ -14,7 +14,7 @@ public class SQLParameter<T> {
         this.value = value;
     }
 
-    public T getValue() {
+    public Object getValue() {
         return value;
     }
 

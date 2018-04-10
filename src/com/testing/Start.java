@@ -5,27 +5,33 @@ import com.lib.dal.entities.DBConfig;
 import com.lib.dal.entities.SQLParameter;
 
 import java.sql.ResultSet;
+import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
-class Doctor{
-    int id;
-    String name, surname, title;
+class Testiranje{
+    int id, integer;
+    String string, anotherString;
+    boolean bool;
+    Date date;
 
-    public Doctor(int id, String name, String surname, String title) {
+    public Testiranje(int id, int integer, String string, String anotherString, boolean bool, Date date) {
         this.id = id;
-        this.name = name;
-        this.surname = surname;
-        this.title = title;
+        this.integer = integer;
+        this.string = string;
+        this.anotherString = anotherString;
+        this.bool = bool;
+        this.date = date;
     }
 
     @Override
     public String toString() {
-        return "Doctor{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", title='" + title + '\'' +
+        return "Testiranje{" +
+                "integer=" + integer +
+                ", string='" + string + '\'' +
+                ", anotherString='" + anotherString + '\'' +
+                ", bool=" + bool +
+                ", date=" + date +
                 '}';
     }
 }
@@ -34,32 +40,56 @@ public class Start {
 
     public static void main(String[] args){
         DBExecutor executor = new DBExecutor(new DBConfig(
-           "localhost",
-           "HOKISQL",
-           "JAVASTART",
-           "Administrator",
-           null
+           "den1.mssql1.gear.host",
+           null,
+           "testiranjejave",
+           "testiranjejave",
+           "Lu00?H1-GJKa",
+           1433,
+           false
         ));
 
-        Function<Object[], Doctor> converter =
-                array -> new Doctor((int)array[0], (String)array[1], (String)array[2], (String)array[3]);
+        Function<Object[], Testiranje> converter =
+                array -> new Testiranje((int)array[0], (int) array[2], (String)array[1], (String)array[4], (boolean)array[3], (Date)array[5]);
 
-        List<Doctor> resultSet = executor.executeQuery("SELECT * FROM Doctor", converter);
-        for (Doctor doctor : resultSet) {
+        List<Testiranje> resultSet = executor.executeQuery("SELECT * FROM Testiranje", converter);
+        for (Testiranje doctor : resultSet) {
             System.out.println(doctor);
         }
 
-        System.out.println("====================================");
-
-        List<Doctor> results = executor.executeProcedure("getDoctors", converter);
-        for (Doctor doctor : results) {
-            System.out.println(doctor);
-        }
+        boolean done;
 
         System.out.println("====================================");
 
-        boolean done = executor.executeProcedure("deleteDoctor", new SQLParameter(8));
+        done = executor.executeProcedure("removeItem", new SQLParameter<Integer>(4));
         System.out.println(done);
-    }
 
+        System.out.println("====================================");
+
+        SQLParameter<Integer> idParameter = new SQLParameter<Integer>(true, -1);
+
+        done = executor.executeProcedure("addItem",
+                new SQLParameter<String>("Unosim jos jedan item"),
+                new SQLParameter<Integer>(34),
+                new SQLParameter<Boolean>(false),
+                new SQLParameter<String>("Radiiiiiiiiiii"),
+                idParameter);
+
+        //int id = byteArrayToInt((byte[])idParameter.getValue());
+        System.out.println(idParameter.getValue().getClass().getTypeName());
+
+        System.out.println("====================================");
+
+        List<Testiranje> results = executor.executeProcedure("getItems", converter);
+        for (Testiranje doctor : results) {
+            System.out.println(doctor);
+        }
+    }
+    public static int byteArrayToInt(byte[] b)
+    {
+        return   b[3] & 0xFF |
+                (b[2] & 0xFF) << 8 |
+                (b[1] & 0xFF) << 16 |
+                (b[0] & 0xFF) << 24;
+    }
 }
