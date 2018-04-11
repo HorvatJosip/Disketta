@@ -1,14 +1,6 @@
 package com.lib.dal.entities;
 
 public class DBConfig {
-
-    //{0} - server name
-    //{1} - instance name
-    //{2} - port number
-    //user
-    //password
-    //databaseName
-    //integratedSecurity
     private String serverName;
     private String databaseName;
     private String instanceName;

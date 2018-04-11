@@ -10,7 +10,7 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/../../../Microsoft JDBC Driver 6.4 for SQL Server/sqljdbc_6.4/enu/mssql-jdbc-6.4.0.jre8.jar!/" />
+          <root url="jar://C:/Program Files/sqljdbc_6.4/enu/mssql-jdbc-6.4.0.jre8.jar!/" />
         </CLASSES>
         <JAVADOC />
         <SOURCES />

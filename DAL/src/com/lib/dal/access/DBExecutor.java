@@ -37,6 +37,14 @@ public class DBExecutor {
         return null;
     }
 
+    public int executeProcedure(String procedureName, SQLParameter... parameters){
+        return (int)exec(procedureName, null, parameters);
+    }
+
+    public <T> List<T> executeProcedure(String procedureName, Function<Object[], T> converter, SQLParameter... parameters){
+        return (List<T>)exec(procedureName, converter, parameters);
+    }
+
     private <T> List<T> GetResults(ResultSet resultSet, Function<Object[], T> converter)
             throws SQLException {
         List<T> result = new ArrayList<>();
@@ -55,22 +63,22 @@ public class DBExecutor {
         return result;
     }
 
-    public <T> List<T> executeProcedure(String procedureName, Function<Object[], T> converter, SQLParameter... parameters) {
+    private <T> Object exec(String procedureName, Function<Object[], T> converter, SQLParameter... parameters) {
         String call = "{ CALL " + procedureName;
 
         if (parameters.length > 0) {
 
-            String paramDefinitions = " ( ";
+            StringBuilder stringBuilder = new StringBuilder(" ( ");
 
             for (int i = 0; i < parameters.length; i++) {
-                paramDefinitions += "?";
+                stringBuilder.append("?");
 
                 if (i != parameters.length - 1)
-                    paramDefinitions += ", ";
+                    stringBuilder.append(", ");
             }
 
-            paramDefinitions += " )";
-            call += paramDefinitions;
+            stringBuilder.append(" )");
+            call += stringBuilder.toString();
 
         }
 
@@ -85,7 +93,7 @@ public class DBExecutor {
                 if (!parameter.getOutputParam())
                     statement.setObject(i + 1, parameter.getValue());
                 else
-                    statement.registerOutParameter(i + 1, Types.OTHER);
+                    statement.registerOutParameter(i + 1, parameter.getOutputType());
             }
 
             if(converter != null)
@@ -100,16 +108,12 @@ public class DBExecutor {
                         parameter.setValue(statement.getObject(i + 1));
                 }
 
-                System.out.println(changed);
-                return new ArrayList<>();
+                return  changed;
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
 
         return null;
-    }
-    public boolean executeProcedure(String procedureName, SQLParameter... parameters){
-        return executeProcedure(procedureName, null, parameters) != null;
     }
 }
