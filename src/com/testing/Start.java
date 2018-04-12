@@ -4,6 +4,9 @@ import com.lib.dal.access.DBExecutor;
 import com.lib.dal.entities.DBConfig;
 import com.lib.dal.entities.SQLParameter;
 import com.lib.xml.XmlHelpers;
+import com.lib.xml.XmlReader;
+import com.lib.xml.XmlTag;
+import com.lib.xml.XmlWriter;
 import org.w3c.dom.Document;
 
 import java.sql.Types;
@@ -13,20 +16,43 @@ import java.util.function.Function;
 
 public class Start {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         //testDAL();
 
         testXML();
     }
 
     private static void testXML() {
-        String filePath = "E:\\Windows Folders\\Desktop\\XML.xml";
-        Document xmlDoc = XmlHelpers.TryGetXmlDocument(filePath, "UTF-8");
+        String desktop = "C:\\Users\\programer10.UCIONE\\Desktop";
+        String filePath = desktop + "\\Disketta\\TestXML.xml";
+        Function<List<String>, Food> converter = list -> new Food(list.get(0), list.get(1), list.get(2), list.get(3));
 
+        try {
+            XmlReader reader = new XmlReader(filePath);
 
+            List<Food> food = reader.getObjects(
+                    new XmlTag("food"),
+                    converter,
+                    new XmlTag("name"),
+                    new XmlTag("price"),
+                    new XmlTag("description"),
+                    new XmlTag("calories")
+                    );
+
+            for (Food item : food) {
+                System.out.println(item);
+            }
+
+            System.out.println("============================");
+
+            XmlWriter writer = new XmlWriter();
+            writer.writeObjectData(desktop + "\\zapis.xml", food, "FoodRoot");
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
     }
 
-    private static void testDAL(){
+    private static void testDAL() {
 
         DBExecutor executor = new DBExecutor(new DBConfig(
                 "den1.mssql1.gear.host",
@@ -39,7 +65,7 @@ public class Start {
         ));
 
         Function<Object[], TestObject> converter =
-                array -> new TestObject((int)array[0], (int) array[2], (String)array[1], (String)array[4], (boolean)array[3], (Date)array[5]);
+                array -> new TestObject((int) array[0], (int) array[2], (String) array[1], (String) array[4], (boolean) array[3], (Date) array[5]);
 
         List<TestObject> resultSet = executor.executeQuery("SELECT * FROM TestObject", converter);
         for (TestObject test : resultSet) {
