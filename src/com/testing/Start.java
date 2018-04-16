@@ -3,27 +3,32 @@ package com.testing;
 import com.lib.dal.access.DBExecutor;
 import com.lib.dal.entities.DBConfig;
 import com.lib.dal.entities.SQLParameter;
-import com.lib.xml.XmlHelpers;
 import com.lib.xml.XmlReader;
 import com.lib.xml.XmlTag;
 import com.lib.xml.XmlWriter;
-import org.w3c.dom.Document;
 
+import javax.swing.filechooser.FileSystemView;
 import java.sql.Types;
 import java.util.Date;
 import java.util.List;
 import java.util.function.Function;
 
 public class Start {
+    private static String desktop;
 
     public static void main(String[] args) {
-        //testDAL();
+        desktop = FileSystemView.getFileSystemView().getHomeDirectory().getAbsolutePath();
 
-        testXML();
+        try {
+            testDAL();
+        }catch (Exception ex){
+            ex.printStackTrace();
+        }
+
+        //testXML();
     }
 
     private static void testXML() {
-        String desktop = "C:\\Users\\programer10.UCIONE\\Desktop";
         String filePath = desktop + "\\Disketta\\TestXML.xml";
         Function<List<String>, Food> converter = list -> new Food(list.get(0), list.get(1), list.get(2), list.get(3));
 
@@ -52,22 +57,14 @@ public class Start {
         }
     }
 
-    private static void testDAL() {
+    private static void testDAL() throws Exception {
 
-        DBExecutor executor = new DBExecutor(new DBConfig(
-                "den1.mssql1.gear.host",
-                null,
-                "testiranjejave",
-                "testiranjejave",
-                "Lu00?H1-GJKa",
-                1433,
-                false
-        ));
+        DBExecutor executor = new DBExecutor(new DBConfig(desktop + "\\CS.xml"));
 
         Function<Object[], TestObject> converter =
                 array -> new TestObject((int) array[0], (int) array[2], (String) array[1], (String) array[4], (boolean) array[3], (Date) array[5]);
 
-        List<TestObject> resultSet = executor.executeQuery("SELECT * FROM TestObject", converter);
+        List<TestObject> resultSet = executor.executeQuery("SELECT * FROM Testiranje", converter);
         for (TestObject test : resultSet) {
             System.out.println(test);
         }
@@ -76,7 +73,7 @@ public class Start {
 
         System.out.println("====================================");
 
-        rowsChanged = executor.executeProcedure("removeItem", new SQLParameter<Integer>(new Integer(15)));
+        rowsChanged = executor.executeProcedure("removeItem", new SQLParameter<Integer>(new Integer(32)));
         System.out.println("Rows changed: " + rowsChanged);
 
         System.out.println("====================================");

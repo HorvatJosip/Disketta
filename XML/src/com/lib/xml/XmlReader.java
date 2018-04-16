@@ -6,7 +6,9 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 public class XmlReader {
@@ -45,10 +47,8 @@ public class XmlReader {
         return values;
     }
 
-    public <T> List<T> getObjects(XmlTag targetTag,
-                                  Function<List<String>, T> converter,
-                                  XmlTag... childTagsToFind) throws Exception {
-        List<T> objects = new ArrayList<>();
+    public Map<String, List<String>> getXMLData(XmlTag targetTag, XmlTag... childTagsToFind) throws Exception {
+        Map<String, List<String>> xmlData = new HashMap<>();
 
         //Find all the tags with the wanted name
         NodeList targetNodes = xmlDoc.getElementsByTagName(targetTag.getTagName());
@@ -57,6 +57,8 @@ public class XmlReader {
         for (int i = 0; i < targetNodes.getLength(); i++) {
             //Create a list that holds current node's attribute values and its children's node and attribute values
             List<String> itemData = new ArrayList<>();
+            //Tag that goes into the map if it has any values
+            String xmlTag = null;
 
             //Node that holds all the wanted values (its children are leaf nodes)
             Node targetNode = targetNodes.item(i);
@@ -68,6 +70,7 @@ public class XmlReader {
             //Get the child nodes of the current target node
             NodeList children = targetNode.getChildNodes();
             for (XmlTag childTag : childTagsToFind) {
+                xmlTag = childTag.getTagName();
 
                 for (int j = 0; j < children.getLength(); j++) {
                     //Current child node (j loop) of the current target node (i loop)
@@ -83,7 +86,7 @@ public class XmlReader {
                     if (childNodeName.equals(childTagName)) {
                         String nodeValue = childNode.getTextContent();
 
-                        if(nodeValue != null)
+                        if (nodeValue != null)
                             itemData.add(nodeValue);
 
                         if (childTag.hasAttributes())
@@ -93,9 +96,23 @@ public class XmlReader {
 
             }//foreach - loops through the requested child nodes that are used to create the object
 
-            //Create an instance of the object using the converter and add it to the list
-            objects.add(converter.apply(itemData));
+            //If the tag has some values...
+            if (!itemData.isEmpty())
+                //Add the tag and its values (node and/or attribute values) to the Map
+                xmlData.put(xmlTag, itemData);
         }//for(i) - loops through the target nodes
+
+        return xmlData;
+    }
+
+    public <T> List<T> getObjects(XmlTag targetTag,
+                                  Function<List<String>, T> converter,
+                                  XmlTag... childTagsToFind) throws Exception {
+        List<T> objects = new ArrayList<>();
+        Map<String, List<String>> xmlValues = getXMLData(targetTag, childTagsToFind);
+
+        for (String key : xmlValues.keySet())
+            objects.add(converter.apply(xmlValues.get(key)));
 
         return objects;
     }
