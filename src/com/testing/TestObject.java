@@ -5,16 +5,40 @@ import java.util.Date;
 public class TestObject {
     private int id, integer;
     private String string, anotherString;
-    private boolean bool;
+    private boolean aBoolean;
     private Date date;
 
-    public TestObject(int id, int integer, String string, String anotherString, boolean bool, Date date) {
+    public TestObject(int id, int integer, String string, String anotherString, boolean aBoolean, Date date) {
         this.id = id;
         this.integer = integer;
         this.string = string;
         this.anotherString = anotherString;
-        this.bool = bool;
+        this.aBoolean = aBoolean;
         this.date = date;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public int getInteger() {
+        return integer;
+    }
+
+    public String getString() {
+        return string;
+    }
+
+    public String getAnotherString() {
+        return anotherString;
+    }
+
+    public boolean isaBoolean() {
+        return aBoolean;
+    }
+
+    public Date getDate() {
+        return date;
     }
 
     @Override
@@ -24,8 +48,8 @@ public class TestObject {
                 ", integer=" + integer +
                 ", string='" + string + '\'' +
                 ", anotherString='" + anotherString + '\'' +
-                ", bool=" + bool +
+                ", aBoolean=" + aBoolean +
                 ", date=" + date +
-                '}';
+                '}' + "\n";
     }
 }

@@ -1,5 +1,6 @@
 package com.testing;
 
+import com.lib.dal.access.CsvHelper;
 import com.lib.dal.access.DBExecutor;
 import com.lib.dal.entities.DBConfig;
 import com.lib.dal.entities.SQLParameter;
@@ -21,7 +22,7 @@ public class Start {
 
         try {
             testDAL();
-        }catch (Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
 
@@ -42,7 +43,7 @@ public class Start {
                     new XmlTag("price"),
                     new XmlTag("description"),
                     new XmlTag("calories")
-                    );
+            );
 
             for (Food item : food) {
                 System.out.println(item);
@@ -97,5 +98,16 @@ public class Start {
             System.out.println(test);
         }
 
+        String[] columnNames = {"String", "Integer", "Boolean", "AnotherString"};
+        boolean insertSucceeded = executor.bulkInsert("Testiranje", columnNames, results, 5);
+
+        System.out.println("Bulk insert succeeded: " + insertSucceeded);
+
+        CsvHelper csvHelper = new CsvHelper();
+        String csvPath = desktop + "\\csv_test.csv";
+        //csvHelper.write(csvPath, columnNames, results, true);
+        System.out.println(csvHelper.read(csvPath, 2, items -> new TestObject(
+                1, Integer.parseInt(items[1]), items[0], items[3], Boolean.parseBoolean(items[2]), new Date()
+        )));
     }
 }

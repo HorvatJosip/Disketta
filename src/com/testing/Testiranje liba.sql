@@ -1,3 +1,9 @@
+IF(DB_ID('DiskettaTesting') IS NULL)
+	CREATE DATABASE DiskettaTesting
+GO
+USE DiskettaTesting
+GO
+
 CREATE TABLE Testiranje
 (
 	ID INT PRIMARY KEY IDENTITY NOT NULL,
@@ -63,6 +69,13 @@ SELECT * FROM Testiranje
 
 GO
 
+CREATE PROC clear
+AS
+DELETE FROM Testiranje
+DBCC CHECKIDENT('Testiranje', RESEED, 0)
+
+GO
+
 INSERT INTO Testiranje(String, Integer, Boolean, Date, AnotherString) VALUES
 ('Stuff5', 223, 1, '20170517', 'Shit3'),
 ('Stuff1', 95, 0, NULL, 'Shit7'),
@@ -71,3 +84,7 @@ INSERT INTO Testiranje(String, Integer, Boolean, Date, AnotherString) VALUES
 ('Stuff4', 21, 0, '20120527', 'Shit4'),
 ('Stuff6', 24, 0, '20051213', 'Shit2'),
 ('Stuff7', 266, 1, NULL, 'Shit1')
+
+/*
+EXEC clear
+*/
